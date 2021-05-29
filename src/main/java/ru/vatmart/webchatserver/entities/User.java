@@ -1,17 +1,20 @@
 package ru.vatmart.webchatserver.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import ru.vatmart.webchatserver.entities.enums.Role;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,6 +46,9 @@ public class User {
     @Column(name = "registration_date", updatable = false)
     private LocalDateTime registrationDate;
 
+    @Transient
+    private Collection<? extends GrantedAuthority> authorities;
+
     //@JoinColumn(name = "image_id")
     //@OneToOne(mappedBy = "image_id", orphanRemoval = true)
     //private ImageModel avatar;
@@ -59,6 +65,57 @@ public class User {
         this.login = login;
         this.nickname = nickname;
         this.password = password;
+    }
+
+    public User(Long id, String login, String nickname, String password, List<GrantedAuthority> authorities, LocalDateTime registrationDate) {
+        this.user_id = id;
+        this.authorities = authorities;
+        this.login = login;
+        this.nickname = nickname;
+        this.password = password;
+    }
+
+    public User(Long user_id, String login, String nickname, String password, Set<Role> roles, LocalDateTime registrationDate) {
+        this.user_id = user_id;
+        this.login = login;
+        this.nickname = nickname;
+        this.password = password;
+        this.roles = roles;
+        this.registrationDate = registrationDate;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return login;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 
     public Long getId() {
@@ -83,10 +140,6 @@ public class User {
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public void setPassword(String password) {

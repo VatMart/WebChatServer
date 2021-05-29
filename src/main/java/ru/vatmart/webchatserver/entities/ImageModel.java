@@ -19,7 +19,7 @@ public class ImageModel {
     @JsonIgnore
     private Long userId;
     @JsonIgnore
-    private Long postId;
+    private Long messageId;
 
     public ImageModel() {
     }
@@ -56,11 +56,11 @@ public class ImageModel {
         this.userId = userId;
     }
 
-    public Long getPostId() {
-        return postId;
+    public Long getMessageId() {
+        return messageId;
     }
 
-    public void setPostId(Long postId) {
-        this.postId = postId;
+    public void setMessageId(Long messageId) {
+        this.messageId = messageId;
     }
 }
