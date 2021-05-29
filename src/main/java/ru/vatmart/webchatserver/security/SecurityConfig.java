@@ -2,6 +2,8 @@ package ru.vatmart.webchatserver.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,10 +23,20 @@ import ru.vatmart.webchatserver.services.CustomUserDetailsService;
 )
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
     private JWTAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    @Autowired
     private CustomUserDetailsService customUserDetailsService;
+
+    @Autowired
+    public SecurityConfig(JWTAuthenticationEntryPoint jwtAuthenticationEntryPoint, CustomUserDetailsService customUserDetailsService) {
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+        this.customUserDetailsService = customUserDetailsService;
+    }
+
+    public SecurityConfig(boolean disableDefaults, JWTAuthenticationEntryPoint jwtAuthenticationEntryPoint, CustomUserDetailsService customUserDetailsService) {
+        super(disableDefaults);
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+        this.customUserDetailsService = customUserDetailsService;
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -43,6 +55,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(customUserDetailsService).passwordEncoder(bCryptPasswordEncoder());
+    }
+
+    @Override
+    @Bean(BeanIds.AUTHENTICATION_MANAGER)
+    protected AuthenticationManager authenticationManager() throws Exception {
+        return super.authenticationManager();
     }
 
     @Bean

@@ -11,8 +11,8 @@ import javax.annotation.PostConstruct;
 @SpringBootApplication
 public class WebchatServerApplication {
 
-	@Autowired
-	private UserService userService;
+//	@Autowired
+//	private UserService userService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(WebchatServerApplication.class, args);

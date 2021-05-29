@@ -22,7 +22,7 @@ public class JWTTokenProvider {
     @Value("${jwt.acc-expiration-ms}")
     private long accExp;
 
-    enum JwtTokenType {
+    public enum JwtTokenType {
         refresh,
         access
     }
@@ -76,6 +76,12 @@ public class JWTTokenProvider {
             logger.error("JWT claims string is empty: {}", e.getMessage());
         }
         return false;
+    }
+
+    public Long getExpiredTime(String token) {
+        return Jwts.parser()
+                .setSigningKey(secret)
+                .parseClaimsJws(token).getBody().getExpiration().getTime()/1000;
     }
 
     public Long getUserIdFromToken(String token) {
