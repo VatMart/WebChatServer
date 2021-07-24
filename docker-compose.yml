@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  postgres:
+    build:
+      context: service/postgres
+      dockerfile: Dockerfile.development
+    ports:
+      - "5434:5432"
+    environment:
+      CLIENT_PATH: ${CLIENT_PATH}
+      POSTGRES_USER: postgres
+      POSTGRES_DB: web_chat
+      POSTGRES_PASSWORD: 72417
+    volumes:
+      - "db-data:/var/lib/postgresql/data"
+  server:
+    env_file:
+      - prop.env
+    build:
+      context: service/server
+      dockerfile: Dockerfile.development
+    command: java -jar ./webchat.jar
+    depends_on:
+      - postgres
+    image: 'webchat-server'
+    environment:
+      - PORT=8091
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres/web_chat
+      - DB_PASSWORD=72417
+      - JS_URL=http://localhost
+      - CLIENT_PATH=${CLIENT_PATH}
+    ports:
+      - "8091:8091"
+  client:
+    build:
+      context: service/client
+      dockerfile: Dockerfile.development
+    image: 'webchat-client'
+    links:
+      - "server"
+    depends_on:
+      - "server"
+    ports:
+      - "80:4200"
+volumes:
+  db-data:

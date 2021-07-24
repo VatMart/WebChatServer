@@ -15,7 +15,7 @@ import java.util.Map;
 @Component
 public class JWTTokenProvider {
     public static final Logger logger = LoggerFactory.getLogger(JWTTokenProvider.class);
-    @Value("$(jwt.secret)")
+    @Value("${jwt.secret}")
     private String secret;
     @Value("${jwt.ref-expiration-ms}")
     private long refExp;

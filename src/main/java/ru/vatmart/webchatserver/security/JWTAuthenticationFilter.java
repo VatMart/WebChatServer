@@ -50,9 +50,14 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String getJWTFromRequest(HttpServletRequest request) {
+
         String bearToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearToken) && bearToken.startsWith("Bearer ")) {
             return bearToken.split(" ")[1];
+        } else if (request.getParameterMap().get("auth") != null) {
+            String token = request.getParameterMap().get("auth")[0];
+            System.out.println("FILTER JWTAUTH TAKE TOKEN FROM URI");
+            return token;
         }
         return null;
     }

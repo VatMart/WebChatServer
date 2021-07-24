@@ -3,25 +3,33 @@ package ru.vatmart.webchatserver.services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.vatmart.webchatserver.entities.Room;
 import ru.vatmart.webchatserver.entities.User;
 import ru.vatmart.webchatserver.entities.enums.Role;
 import ru.vatmart.webchatserver.exceptions.UserExistException;
 import ru.vatmart.webchatserver.payloads.requests.SignupRequest;
+import ru.vatmart.webchatserver.repositories.RoomRepository;
 import ru.vatmart.webchatserver.repositories.UserRepository;
 
 import javax.transaction.Transactional;
+import java.security.Principal;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserService {
     public static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
+    private final RoomRepository roomRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, RoomRepository roomRepository, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.roomRepository = roomRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -42,9 +50,30 @@ public class UserService {
         }
     }
 
-    //TODO delete this
-    public void printUsers() {
-        System.out.println(userRepository.findAll());
+    @Transactional
+    public User getCurrentUser(Principal principal) {
+        return getUserByPrincipal(principal);
     }
 
+    @Transactional
+    public User getUserById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    @Transactional
+    public Set<Room> getUserRooms(Principal principal) {
+        User user = getUserByPrincipal(principal);
+        return user.getRooms();
+    }
+
+    private User getUserByPrincipal(Principal principal) {
+        String login = principal.getName();
+        return userRepository.findByLogin(login)
+                .orElseThrow(() -> new UsernameNotFoundException("Username not found with login " + login));
+    }
+
+    public User getUserByNickname(String nickname) {
+        return userRepository.findByNickname(nickname).
+                orElseThrow(() -> new UsernameNotFoundException("Username not found with nickname " + nickname));
+    }
 }

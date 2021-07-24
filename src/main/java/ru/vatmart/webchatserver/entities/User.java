@@ -7,10 +7,7 @@ import ru.vatmart.webchatserver.entities.enums.Role;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
@@ -35,12 +32,12 @@ public class User implements UserDetails {
     private Set<Role> roles = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sender", orphanRemoval = true)
-    private List<Message> messages;
+    private List<Message> messages = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(name = "user_room", joinColumns =  @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "room_id"))
-    private List<Room> rooms;
+    private Set<Room> rooms = new HashSet<>();
 
     @JsonFormat(pattern = "yyyy-mm-dd HH:mm:ss")
     @Column(name = "registration_date", updatable = false)
@@ -82,6 +79,16 @@ public class User implements UserDetails {
         this.password = password;
         this.roles = roles;
         this.registrationDate = registrationDate;
+    }
+
+    public void addRoom(Room room) {
+        this.rooms.add(room);
+        room.getUsers().add(this);
+    }
+
+    public void removeRoom(Room room) {
+        this.rooms.remove(room);
+        room.getUsers().remove(this);
     }
 
     @Override
@@ -186,11 +193,40 @@ public class User implements UserDetails {
         this.messages = messages;
     }
 
-    public List<Room> getRooms() {
+    public Set<Room> getRooms() {
         return rooms;
     }
 
-    public void setRooms(List<Room> rooms) {
+    public void setRooms(Set<Room> rooms) {
         this.rooms = rooms;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return user_id.equals(user.user_id) &&
+                login.equals(user.login) &&
+                nickname.equals(user.nickname) &&
+                password.equals(user.password) &&
+                Objects.equals(registrationDate, user.registrationDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(user_id, login, nickname, password, registrationDate);
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "user_id=" + user_id +
+                ", login='" + login + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", password='" + password + '\'' +
+                ", roles=" + roles +
+                ", registrationDate=" + registrationDate +
+                '}';
     }
 }

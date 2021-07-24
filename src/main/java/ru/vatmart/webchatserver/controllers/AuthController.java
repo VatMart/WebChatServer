@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@CrossOrigin
+//@CrossOrigin
 @RestController
 @RequestMapping("/api/auth")
 @PreAuthorize("permitAll()")

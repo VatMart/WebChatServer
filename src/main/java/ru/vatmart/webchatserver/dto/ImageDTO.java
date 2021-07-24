@@ -1,26 +1,12 @@
-package ru.vatmart.webchatserver.entities;
+package ru.vatmart.webchatserver.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import javax.persistence.*;
 import java.util.Arrays;
-import java.util.Objects;
 
-@Entity
-@Table(name = "images")
-public class ImageModel {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ImageDTO {
     private Long image_id;
-    @Column(nullable = false)
     private String name;
-    @Lob
     private byte[] imageBytes;
-    //@JsonIgnore
-    @Column(name = "user_id", unique = true)
     private Long userId;
-    //@JsonIgnore
     private Long messageId;
 
     public Long getImage_id() {
@@ -61,16 +47,5 @@ public class ImageModel {
 
     public void setMessageId(Long messageId) {
         this.messageId = messageId;
-    }
-
-    @Override
-    public String toString() {
-        return "ImageModel{" +
-                "image_id=" + image_id +
-                ", name='" + name + '\'' +
-                ", imageBytes=" + Arrays.toString(imageBytes) +
-                ", userId=" + userId +
-                ", messageId=" + messageId +
-                '}';
     }
 }
