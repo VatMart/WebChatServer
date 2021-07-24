@@ -11,7 +11,7 @@ services:
       CLIENT_PATH: ${CLIENT_PATH}
       POSTGRES_USER: postgres
       POSTGRES_DB: web_chat
-      POSTGRES_PASSWORD: 72417
+      POSTGRES_PASSWORD: *SECRET*
     volumes:
       - "db-data:/var/lib/postgresql/data"
   server:
@@ -27,7 +27,7 @@ services:
     environment:
       - PORT=8091
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres/web_chat
-      - DB_PASSWORD=72417
+      - DB_PASSWORD=*SECRET*
       - JS_URL=http://localhost
       - CLIENT_PATH=${CLIENT_PATH}
     ports:
